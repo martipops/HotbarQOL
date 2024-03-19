@@ -56,7 +56,8 @@ namespace HotbarQOL
             Main.hotbarScale[0] = 1f;
             for (int i = 1; i < numSlots; i++) Main.hotbarScale[i] = 0.75f;
             HotbarEdit.UpdateSlotCount();
-            HotbarEdit.swappedBar = false;
+            if (numSlots >= 50) 
+                HotbarEdit.swappedBar = false;
         }
     }
 }
