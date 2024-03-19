@@ -1,0 +1,56 @@
+Configs: {
+	Config: {
+		DisplayName: Hotbar Config
+
+		numSlots: {
+			Label: Slot Count
+			Tooltip: Number of slots to display in the hotbar (Max:40)
+		}
+
+		Headers: {
+			HotbarSettings: Hotbar Settings
+			HotbarPosition: Hotbar Position
+		}
+
+		xOffset: {
+			Label: X Offset
+			Tooltip: Adjust x position of hotbar on screen (Default: 20)
+		}
+
+		yOffset: {
+			Label: Y Offset
+			Tooltip: Adjust y position of hotbar on screen (Default: 0)
+		}
+
+		vAlign: {
+			Label: Vertical Align (Top, Bottom)
+			Tooltip: Aligns the hotbar at the top or the bottom of the screen
+		}
+
+		hAlign: {
+			Label: Horizontal Align (Left, Center, Right)
+			Tooltip: Aligns the hotbar at left, center or right of the screen.
+		}
+
+		hotbarSwitcher: {
+			Label: hotbar Switcher
+			Tooltip: ""
+		}
+	}
+
+	VerticalAlignment: {
+		Tooltip: ""
+		Top.Label: Top
+		Center.Label: Center
+		Bottom.Label: Bottom
+	}
+
+	HorizontalAlignment: {
+		Tooltip: ""
+		Left.Label: Left
+		Right.Label: Right
+		Center.Label: Center
+	}
+}
+
+Keybinds.SwapKeybind.DisplayName: Swap Keybind

@@ -1,0 +1,9 @@
+displayName = Hotbar QOL (More Slots)
+author = Martipops
+version = 2024.2.28.2
+homepage = https://discord.gg/MKcjBKwBVu
+side = Client
+hideCode = false
+hideResources = false
+includeSource = true
+buildIgnore = *.csproj, bin\*, .vs\*, *.sln, obj\*
