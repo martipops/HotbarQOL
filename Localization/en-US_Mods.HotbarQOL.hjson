@@ -10,6 +10,7 @@ Configs: {
 		Headers: {
 			HotbarSettings: Hotbar Settings
 			HotbarPosition: Hotbar Position
+			Advanced: Advanced Header
 		}
 
 		xOffset: {
@@ -32,9 +33,14 @@ Configs: {
 			Tooltip: Aligns the hotbar at left, center or right of the screen.
 		}
 
-		hotbarSwitcher: {
-			Label: hotbar Switcher
-			Tooltip: ""
+		itemSwapper: {
+			Label: Item Swapper
+			Tooltip: Whether or not double tapping a hotbar key will swap the selected item between hotbars.
+		}
+
+		doubleTapSpeed: {
+			Label: Double Tap Speed
+			Tooltip: The max delay for a double-tap to be detected for item swapping.
 		}
 	}
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using MonoMod.Cil;
 using ReLogic.Graphics;
 using Terraria;
 using Terraria.Audio;
@@ -16,9 +17,9 @@ namespace HotbarQOL
 {
     public class HotbarEdit : ModSystem
     {
-        public static bool swappedBar = false;
+        public static bool IsSwappedBar = false;
+        public static (int, int) SlotRange = (0, 10);
         private static int slotCount = 10;
-        private static (int, int) slotRange = (0, 10);
 
         public static ModKeybind SwapKeybind { get; private set; }
 
@@ -26,6 +27,7 @@ namespace HotbarQOL
         {
             On_Main.GUIHotbarDrawInner += On_Main_GUIHotbarDrawInner;
             On_Player.ScrollHotbar += On_Player_ScrollHotbar;
+            IL_Player.Update += IL_Player_Update;
 
             // Keybinds
             SwapKeybind = KeybindLoader.RegisterKeybind(Mod, "SwapKeybind", "CapsLock");
@@ -33,51 +35,95 @@ namespace HotbarQOL
 
         }
 
+
+
         public override void Unload()
         {
             On_Main.GUIHotbarDrawInner -= On_Main_GUIHotbarDrawInner;
             On_Player.ScrollHotbar -= On_Player_ScrollHotbar;
+            IL_Player.Update -= IL_Player_Update;
 
             // Keybinds
             SwapKeybind = null;
-            swappedBar = false;
+            IsSwappedBar = false;
         }
         public override void OnWorldLoad()
         {
             Config.Instance.OnChanged();
         }
 
-        public static void SwapBar(Player player) {
-            if (Config.Instance.numSlots >= 50) {
-                swappedBar = false;
+
+        // Never forget this BS. Cant beleive i fixed this
+        // Fixes bug where switching to an item while using it does 
+        // not go to the correct position while the hotbar is swapped.
+        private void IL_Player_Update(ILContext il)
+        {
+            ILCursor c = new ILCursor(il);
+            for (int i = 0; i < 10; i++)
+            {
+                if (!c.TryGotoNext(MoveType.Before, i => i.MatchStfld(typeof(Player).GetField("selectedItem")))) return; 
+                c.EmitDelegate(GetHotbarOffset);
+                c.Index += 2;
+            }
+            if (!c.TryGotoNext(MoveType.After, i => i.MatchStloc(50))) return;
+            for (int i = 0; i < 10; i++)
+            {
+                if (!c.TryGotoNext(MoveType.Before, i => i.MatchStloc(50))) return;
+                c.EmitDelegate(GetHotbarOffset);
+                c.Index += 2;
+            }
+
+        }
+
+        public static int GetHotbarOffset(int i) {
+            return Math.Min(i + SlotRange.Item1, 50);
+        }
+
+        public static void SwapBar(Player player)
+        {
+            if (Config.Instance.numSlots >= 50)
+            {
+                IsSwappedBar = false;
                 return;
             }
-            swappedBar = !swappedBar;
+            IsSwappedBar = !IsSwappedBar;
             UpdateSlotCount();
-            if (swappedBar) {
-                player.selectedItem += slotRange.Item1 % slotCount;
-            } else {
-                player.selectedItem -= slotRange.Item2;
+            if (IsSwappedBar)
+            {
+                player.selectedItem += SlotRange.Item1 % slotCount;
+            }
+            else
+            {
+                player.selectedItem -= SlotRange.Item2;
             }
         }
-        public static void UpdateSlotCount() {
+
+        // TODO: simplify this bs
+        public static void UpdateSlotCount()
+        {
             if (Config.Instance == null) return;
-            if (swappedBar) {
+            if (IsSwappedBar)
+            {
                 slotCount = Math.Min(Config.Instance.numSlots, 50 - Config.Instance.numSlots);
-            } else {
+            }
+            else
+            {
                 slotCount = Config.Instance.numSlots;
             }
             updateSlotRange();
         }
 
-        private static void updateSlotRange() {
-            if(swappedBar) {
-                slotRange = (Config.Instance.numSlots, Config.Instance.numSlots + slotCount);
-            } else {
-                slotRange = (0, Config.Instance.numSlots);
+        private static void updateSlotRange()
+        {
+            if (IsSwappedBar)
+            {
+                SlotRange = (Config.Instance.numSlots, Config.Instance.numSlots + slotCount);
+            }
+            else
+            {
+                SlotRange = (0, Config.Instance.numSlots);
             }
         }
-
 
 
         private void On_Player_ScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int scrollAmount)
@@ -85,8 +131,9 @@ namespace HotbarQOL
             int slotPos = self.selectedItem;
 
             // Offset the `selected item position` to be relative to 0
-            if (swappedBar) {
-                slotPos -= slotRange.Item1;
+            if (IsSwappedBar)
+            {
+                slotPos -= SlotRange.Item1;
             }
 
             // Prevent selected item from out of bounds of hotbar
@@ -94,8 +141,8 @@ namespace HotbarQOL
             {
                 self.selectedItem %= slotCount;
                 return;
-            } 
-            
+            }
+
             // Overscroll handling
             while (scrollAmount > slotCount - 1)
             {
@@ -118,7 +165,7 @@ namespace HotbarQOL
                 self.nonTorch = -1;
             }
 
-            // Handle manual select
+            // Handle manual (click) select
             if (self.changeItem >= 0)
             {
                 if (slotPos != self.changeItem)
@@ -129,7 +176,7 @@ namespace HotbarQOL
                 self.changeItem = -1;
             }
 
-            // idek tbh
+            // gracefully handle bounds *again*
             if (self.itemAnimation == 0 && self.selectedItem != 58)
             {
                 while (slotPos > slotCount - 1)
@@ -143,7 +190,7 @@ namespace HotbarQOL
             }
 
             //set item to updated position + offset
-            self.selectedItem = slotPos + slotRange.Item1;
+            self.selectedItem = slotPos + SlotRange.Item1;
         }
 
         private void On_Main_GUIHotbarDrawInner(On_Main.orig_GUIHotbarDrawInner orig, Main self)
@@ -165,16 +212,17 @@ namespace HotbarQOL
                 if (Config.Instance.hAlign == HorizontalAlignment.Center)
                     xOff /= 2;
             }
-            if (Config.Instance.vAlign == VerticalAlignment.Bottom) {
+            if (Config.Instance.vAlign == VerticalAlignment.Bottom)
+            {
                 yOff += screenHeight - 72;
             }
-            DynamicSpriteFontExtensionMethods.DrawString(position: new Vector2(23 * slotCount - FontAssets.MouseText.Value.MeasureString(text).X/2 + xOff, 0f + yOff), spriteBatch: spriteBatch, spriteFont: FontAssets.MouseText.Value, text: text, color: new Color(mouseTextColor, mouseTextColor, mouseTextColor, mouseTextColor), rotation: 0f, origin: default(Vector2), scale: 1f, effects: SpriteEffects.None, layerDepth: 0f);
+            DynamicSpriteFontExtensionMethods.DrawString(position: new Vector2(23 * slotCount - FontAssets.MouseText.Value.MeasureString(text).X / 2 + xOff, 0f + yOff), spriteBatch: spriteBatch, spriteFont: FontAssets.MouseText.Value, text: text, color: new Color(mouseTextColor, mouseTextColor, mouseTextColor, mouseTextColor), rotation: 0f, origin: default(Vector2), scale: 1f, effects: SpriteEffects.None, layerDepth: 0f);
             int num = xOff;
             for (int i = 0; i < slotCount; i++)
             {
                 //Swap Keybind
                 int j = i;
-                j += slotRange.Item1;
+                j += SlotRange.Item1;
 
 
                 if (j == player[myPlayer].selectedItem)
@@ -184,7 +232,7 @@ namespace HotbarQOL
                         hotbarScale[i] += 0.05f;
                     }
                 }
-                else if ((double) hotbarScale[i] > 0.75)
+                else if ((double)hotbarScale[i] > 0.75)
                 {
                     hotbarScale[i] -= 0.05f;
                 }
@@ -215,8 +263,7 @@ namespace HotbarQOL
                 num += (int)((float)TextureAssets.InventoryBack.Width() * hotbarScale[i]) + 4;
             }
             int selectedItem = player[myPlayer].selectedItem;
-            // Main.NewText($"item:{selectedItem}, {slotRange.Item1}, {slotRange.Item2}");
-            if (selectedItem >= slotRange.Item2 || selectedItem < slotRange.Item1 && (selectedItem != 58 || mouseItem.type > ItemID.None))
+            if (selectedItem >= SlotRange.Item2 || selectedItem < SlotRange.Item1 && (selectedItem != 58 || mouseItem.type > ItemID.None))
             {
                 float num4 = 1f;
                 int num5 = (int)(20f + 22f * (1f - num4)) + yOff;
@@ -224,7 +271,7 @@ namespace HotbarQOL
                 Color lightColor2 = new Color(255, 255, 255, a2);
                 float num7 = inventoryScale;
                 inventoryScale = num4;
-                ItemSlot.Draw(spriteBatch, player[myPlayer].inventory, 13, selectedItem, new Vector2(num,num5), lightColor2);
+                ItemSlot.Draw(spriteBatch, player[myPlayer].inventory, 13, selectedItem, new Vector2(num, num5), lightColor2);
                 inventoryScale = num7;
             }
         }

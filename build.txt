@@ -1,6 +1,6 @@
 displayName = Hotbar QOL (More Slots)
 author = Martipops
-version = 2024.2.28.2
+version = 2024.3.21.1
 homepage = https://discord.gg/MKcjBKwBVu
 side = Client
 hideCode = false

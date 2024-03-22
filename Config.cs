@@ -50,6 +50,13 @@ namespace HotbarQOL
         [DefaultValue(0), Range(-1200, 1200)]
         public int yOffset;
 
+        [Header("Advanced")]
+
+        [DefaultValue(true)]
+        public bool itemSwapper;
+
+        [DefaultValue(200), Range(100, 1000)]
+        public int doubleTapSpeed;
         public override void OnChanged()
         {
             Main.hotbarScale = new float[numSlots];
@@ -57,7 +64,7 @@ namespace HotbarQOL
             for (int i = 1; i < numSlots; i++) Main.hotbarScale[i] = 0.75f;
             HotbarEdit.UpdateSlotCount();
             if (numSlots >= 50) 
-                HotbarEdit.swappedBar = false;
+                HotbarEdit.IsSwappedBar = false;
         }
     }
 }
