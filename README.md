@@ -2,7 +2,12 @@
 
 A mod that adds Quality-of-Life features to the hotbar
 
-Features:
-- Modify the number of slots in the hotbar
-- Set a key to swap between hotbars
+## Features
+- Modify the number of slots in the hotbar via the mod config.
+- Set a key bind to swap between hotbars
+- Double tap a any of the hotbar keys to quickly swap items between first and second hotbar. 
 - Align the hotbar to a specific position on screen (choose bottom-left, bottom center, etc.)
+
+---
+
+All settings configurable via mod config.
