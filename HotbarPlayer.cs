@@ -18,9 +18,15 @@ public class HotbarPlayer : ModPlayer
         slotWatch = Stopwatch.StartNew();
     }
 
-    //Restart watch when died cuz why not
+    //Restart watch when died cuz why not *BECAUSE IT CAUSES BUGS but F it*
     public override void OnRespawn()
     {
+        for (int i = 0; i < slotPresses.Length; i++)
+        {
+            slotPresses[i] = false;
+            slotOneShots[i] = false;
+            lastShots[i] = 0;
+        }
         slotWatch = Stopwatch.StartNew();
         base.OnRespawn();
     }
