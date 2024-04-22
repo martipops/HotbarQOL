@@ -42,6 +42,11 @@ Configs: {
 			Label: Double Tap Speed
 			Tooltip: The max delay for a double-tap to be detected for item swapping.
 		}
+
+		deprioritizeInventory: {
+			Label: Slot Items Away From Hotbar
+			Tooltip: If enabled, picked-up items will always slot into the lastmost slots of the inventory.
+		}
 	}
 
 	VerticalAlignment: {

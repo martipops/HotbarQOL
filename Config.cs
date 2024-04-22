@@ -30,7 +30,6 @@ namespace HotbarQOL
         public static Config Instance = ModContent.GetInstance<Config>();
         public override ConfigScope Mode => ConfigScope.ClientSide;
 
-
         [Header("HotbarSettings")]
         [DefaultValue(10), Range(1, 50)]
         public int numSlots;
@@ -57,6 +56,10 @@ namespace HotbarQOL
 
         [DefaultValue(200), Range(100, 1000)]
         public int doubleTapSpeed;
+
+        [DefaultValue(false)]
+        public bool deprioritizeInventory;
+
         public override void OnChanged()
         {
             Main.hotbarScale = new float[numSlots];

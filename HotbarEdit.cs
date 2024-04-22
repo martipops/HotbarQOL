@@ -1,7 +1,9 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using MonoMod.Utils;
 using ReLogic.Graphics;
 using Terraria;
 using Terraria.Audio;
@@ -28,6 +30,7 @@ namespace HotbarQOL
             On_Main.GUIHotbarDrawInner += On_Main_GUIHotbarDrawInner;
             On_Player.ScrollHotbar += On_Player_ScrollHotbar;
             IL_Player.Update += IL_Player_Update;
+            IL_Player.GetItem += IL_Player_GetItem;
 
             // Keybinds
             SwapKeybind = KeybindLoader.RegisterKeybind(Mod, "SwapKeybind", "CapsLock");
@@ -42,11 +45,29 @@ namespace HotbarQOL
             On_Main.GUIHotbarDrawInner -= On_Main_GUIHotbarDrawInner;
             On_Player.ScrollHotbar -= On_Player_ScrollHotbar;
             IL_Player.Update -= IL_Player_Update;
+            IL_Player.GetItem -= IL_Player_GetItem;
 
             // Keybinds
             SwapKeybind = null;
             IsSwappedBar = false;
         }
+
+        // If enabled, picked-up items will stack into the lastmost slots of the inventory
+        private void IL_Player_GetItem(ILContext il)
+        {
+            ILCursor cur = new(il);
+            if (!cur.TryGotoNext(MoveType.After, i => i.MatchLdfld(typeof(Item).GetField("useStyle")))) return;
+            cur.EmitDelegate(HotbarItemPickupOverride);
+        }
+
+        // TODO: Remove this delegate entirely.
+        public static bool HotbarItemPickupOverride(int useStyle)
+        {
+            return !(useStyle == 0 || Config.Instance.deprioritizeInventory);
+        }
+
+
+        // Refresh config on world load
         public override void OnWorldLoad()
         {
             Config.Instance.OnChanged();
@@ -61,7 +82,7 @@ namespace HotbarQOL
             ILCursor c = new ILCursor(il);
             for (int i = 0; i < 10; i++)
             {
-                if (!c.TryGotoNext(MoveType.Before, i => i.MatchStfld(typeof(Player).GetField("selectedItem")))) return; 
+                if (!c.TryGotoNext(MoveType.Before, i => i.MatchStfld(typeof(Player).GetField("selectedItem")))) return;
                 c.EmitDelegate(GetHotbarOffset);
                 c.Index += 2;
             }
@@ -75,7 +96,8 @@ namespace HotbarQOL
 
         }
 
-        public static int GetHotbarOffset(int i) {
+        public static int GetHotbarOffset(int i)
+        {
             return Math.Min(i + SlotRange.Item1, 50);
         }
 
@@ -126,6 +148,7 @@ namespace HotbarQOL
         }
 
 
+        // Modified terraria source. updates the hotbar on scroll depending where the slot is.
         private void On_Player_ScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int scrollAmount)
         {
             int slotPos = self.selectedItem;
@@ -193,6 +216,7 @@ namespace HotbarQOL
             self.selectedItem = slotPos + SlotRange.Item1;
         }
 
+        // Modified terraria source code?
         private void On_Main_GUIHotbarDrawInner(On_Main.orig_GUIHotbarDrawInner orig, Main self)
         {
             if (playerInventory || player[myPlayer].ghost)
