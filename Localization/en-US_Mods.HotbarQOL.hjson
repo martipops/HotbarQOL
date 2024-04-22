@@ -35,7 +35,11 @@ Configs: {
 
 		itemSwapper: {
 			Label: Item Swapper
-			Tooltip: Whether or not double tapping a hotbar key will swap the selected item between hotbars.
+			Tooltip:
+				'''
+				Whether or not double tapping a hotbar key will 
+				swap the selected item between hotbars.
+				'''
 		}
 
 		doubleTapSpeed: {
@@ -45,7 +49,11 @@ Configs: {
 
 		deprioritizeInventory: {
 			Label: Slot Items Away From Hotbar
-			Tooltip: If enabled, picked-up items will always slot into the lastmost slots of the inventory.
+			Tooltip:
+				'''
+				If enabled, picked-up items will always slot 
+				into the lastmost slots of the inventory.
+				'''
 		}
 	}
 
