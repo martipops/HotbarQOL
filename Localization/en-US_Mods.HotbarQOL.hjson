@@ -10,7 +10,8 @@ Configs: {
 		Headers: {
 			HotbarSettings: Hotbar Settings
 			HotbarPosition: Hotbar Position
-			Advanced: Advanced Header
+			ItemSwapping: Item Swapping
+			Advanced: Advanced
 		}
 
 		xOffset: {
@@ -54,6 +55,16 @@ Configs: {
 				If enabled, picked-up items will always slot 
 				into the lastmost slots of the inventory.
 				'''
+		}
+
+		numRows: {
+			Tooltip: Splits the hotbar up into multiple rows (Default: 1)
+			Label: Row Count
+		}
+
+		rowGap: {
+			Label: Row Gap
+			Tooltip: The distance of separation between rows
 		}
 	}
 

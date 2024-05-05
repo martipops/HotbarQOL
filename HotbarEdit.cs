@@ -219,6 +219,7 @@ namespace HotbarQOL
         // Modified terraria source code?
         private void On_Main_GUIHotbarDrawInner(On_Main.orig_GUIHotbarDrawInner orig, Main self)
         {
+            int rowLength = slotCount / Config.Instance.numRows;
             if (playerInventory || player[myPlayer].ghost)
             {
                 return;
@@ -232,7 +233,7 @@ namespace HotbarQOL
                 yOff = Config.Instance.yOffset;
             if (Config.Instance.hAlign != HorizontalAlignment.Left)
             {
-                xOff += screenWidth - (46 * slotCount);
+                xOff += screenWidth - (46 * rowLength);
                 if (Config.Instance.hAlign == HorizontalAlignment.Center)
                     xOff /= 2;
             }
@@ -240,10 +241,27 @@ namespace HotbarQOL
             {
                 yOff += screenHeight - 72;
             }
-            DynamicSpriteFontExtensionMethods.DrawString(position: new Vector2(23 * slotCount - FontAssets.MouseText.Value.MeasureString(text).X / 2 + xOff, 0f + yOff), spriteBatch: spriteBatch, spriteFont: FontAssets.MouseText.Value, text: text, color: new Color(mouseTextColor, mouseTextColor, mouseTextColor, mouseTextColor), rotation: 0f, origin: default(Vector2), scale: 1f, effects: SpriteEffects.None, layerDepth: 0f);
+            DynamicSpriteFontExtensionMethods.DrawString(
+                position: new Vector2(23 * rowLength - FontAssets.MouseText.Value.MeasureString(text).X / 2 + xOff, 0f + yOff),
+                spriteBatch: spriteBatch,
+                spriteFont: FontAssets.MouseText.Value,
+                text: text,
+                color: new Color(mouseTextColor, mouseTextColor, mouseTextColor, mouseTextColor), 
+                rotation: 0f, 
+                origin: default(Vector2),
+                scale: 1f,
+                effects: SpriteEffects.None,
+                layerDepth: 0f
+                );
             int num = xOff;
             for (int i = 0; i < slotCount; i++)
             {
+                if (i % rowLength == 0 && i != 0)
+                {
+                    yOff += 48 + Config.Instance.rowGap;
+                    num = xOff;
+                }
+
                 //Swap Keybind
                 int j = i;
                 j += SlotRange.Item1;

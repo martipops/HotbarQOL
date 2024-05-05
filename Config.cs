@@ -34,6 +34,9 @@ namespace HotbarQOL
         [DefaultValue(10), Range(1, 50)]
         public int numSlots;
 
+        [DefaultValue(1), Range(1, 5)]
+        public int numRows;
+
         [Header("HotbarPosition")]
 
         [DefaultValue(VerticalAlignment.Top)]
@@ -49,7 +52,7 @@ namespace HotbarQOL
         [DefaultValue(0), Range(-1200, 1200)]
         public int yOffset;
 
-        [Header("Advanced")]
+        [Header("ItemSwapping")]
 
         [DefaultValue(true)]
         public bool itemSwapper;
@@ -59,6 +62,12 @@ namespace HotbarQOL
 
         [DefaultValue(false)]
         public bool deprioritizeInventory;
+
+        [Header("Advanced")]
+
+        [DefaultValue(0), Range(-32, 32)]
+        public int rowGap;
+
 
         public override void OnChanged()
         {
