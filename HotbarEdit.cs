@@ -93,7 +93,6 @@ namespace HotbarQOL
                 c.EmitDelegate(GetHotbarOffset);
                 c.Index += 2;
             }
-
         }
 
         public static int GetHotbarOffset(int i)
@@ -120,30 +119,19 @@ namespace HotbarQOL
             }
         }
 
-        // TODO: simplify this bs
         public static void UpdateSlotCount()
         {
             if (Config.Instance == null) return;
             if (IsSwappedBar)
             {
                 slotCount = Math.Min(Config.Instance.numSlots, 50 - Config.Instance.numSlots);
-            }
-            else
-            {
-                slotCount = Config.Instance.numSlots;
-            }
-            updateSlotRange();
-        }
-
-        private static void updateSlotRange()
-        {
-            if (IsSwappedBar)
-            {
                 SlotRange = (Config.Instance.numSlots, Config.Instance.numSlots + slotCount);
             }
             else
             {
+                slotCount = Config.Instance.numSlots;
                 SlotRange = (0, Config.Instance.numSlots);
+
             }
         }
 
@@ -151,6 +139,10 @@ namespace HotbarQOL
         // Modified terraria source. updates the hotbar on scroll depending where the slot is.
         private void On_Player_ScrollHotbar(On_Player.orig_ScrollHotbar orig, Player self, int scrollAmount)
         {
+            if (self.selectedItem >= Config.Instance.numSlots && !IsSwappedBar)
+            {
+                return;
+            }
             int slotPos = self.selectedItem;
 
             // Offset the `selected item position` to be relative to 0

@@ -70,16 +70,37 @@ Configs: {
 
 	VerticalAlignment: {
 		Tooltip: ""
-		Top.Label: Top
+
+		Top: {
+			Label: Top
+			Tooltip: ""
+		}
+
 		Center.Label: Center
-		Bottom.Label: Bottom
+
+		Bottom: {
+			Label: Bottom
+			Tooltip: ""
+		}
 	}
 
 	HorizontalAlignment: {
 		Tooltip: ""
-		Left.Label: Left
-		Right.Label: Right
-		Center.Label: Center
+
+		Left: {
+			Label: Left
+			Tooltip: ""
+		}
+
+		Right: {
+			Label: Right
+			Tooltip: ""
+		}
+
+		Center: {
+			Label: Center
+			Tooltip: ""
+		}
 	}
 }
 
