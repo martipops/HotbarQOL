@@ -54,7 +54,7 @@ namespace HotbarQOL
 
         [Header("ItemSwapping")]
 
-        [DefaultValue(true)]
+        [DefaultValue(false)]
         public bool itemSwapper;
 
         [DefaultValue(200), Range(100, 1000)]

@@ -1,6 +1,6 @@
-displayName = Hotbar QOL (Swap Rows)
+displayName = Hotbar QOL (More Slots)
 author = Martipops
-version = 2025.12.2.1
+version = 2026.7.23.1
 homepage = https://discord.gg/MKcjBKwBVu
 side = Client
 hideCode = false
